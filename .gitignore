@@ -1,0 +1,21 @@
+# Secrets — never commit
+backend/.env
+CLAUDE.local.md
+
+# Python
+backend/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Data — the canonical ledger lives on the VPS in ./data/
+backend/driftwatch.db
+backend/static/
+data/
+backups/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+.DS_Store

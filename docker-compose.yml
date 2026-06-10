@@ -1,0 +1,16 @@
+services:
+  driftwatch:
+    build: .
+    restart: unless-stopped
+    # Bound to localhost ON PURPOSE: the dashboard has no auth. Reach it via
+    # SSH tunnel (see DEPLOY.md). Do not change to "8000:8000" without putting
+    # auth in front.
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - backend/.env
+    environment:
+      # Absolute path inside the container, persisted via the volume below.
+      DRIFTWATCH_DB_URL: sqlite+aiosqlite:////app/data/driftwatch.db
+    volumes:
+      - ./data:/app/data
