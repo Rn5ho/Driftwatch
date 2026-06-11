@@ -59,6 +59,7 @@ export interface Trade {
   fees: number;
   pnl: number | null;
   status: string; // "open" | "closed"
+  closes_at: string | null; // scheduled close (open trades only)
 }
 
 /**

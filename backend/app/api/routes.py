@@ -73,7 +73,17 @@ async def list_trades(limit: int = 50) -> list[dict[str, Any]]:
                 select(Trade).order_by(Trade.entry_ts.desc(), Trade.id.desc()).limit(limit)
             )
         ).scalars().all()
-        return [_to_dict(t) for t in rows]
+        out = []
+        for t in rows:
+            d = _to_dict(t)
+            forecast = await session.get(Forecast, t.forecast_id)
+            d["closes_at"] = (
+                (t.entry_ts + timedelta(hours=forecast.horizon_hours)).isoformat()
+                if forecast is not None and t.status == "open"
+                else None
+            )
+            out.append(d)
+        return out
 
 
 @router.get("/portfolio")

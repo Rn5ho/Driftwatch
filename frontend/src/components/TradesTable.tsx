@@ -19,6 +19,15 @@ function fmtNum(v: number | null, digits = 2): string {
   });
 }
 
+function fmtCloses(t: Trade): string {
+  if (t.status !== "open" || !t.closes_at) return "—";
+  const d = new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(t.closes_at) ? t.closes_at : `${t.closes_at}Z`);
+  if (Number.isNaN(d.getTime())) return "—";
+  const hours = (d.getTime() - Date.now()) / 3_600_000;
+  const rel = hours <= 0 ? "due" : hours < 1 ? `in ${Math.round(hours * 60)}m` : `in ${hours.toFixed(1)}h`;
+  return `${fmtTime(t.closes_at)} (${rel})`;
+}
+
 function sideClass(side: string): string {
   if (side === "long") return "badge badge-long";
   if (side === "short") return "badge badge-short";
@@ -44,6 +53,7 @@ export default function TradesTable({ trades }: Props): JSX.Element {
               <th>Notional</th>
               <th>Entry</th>
               <th>Exit</th>
+              <th>Closes</th>
               <th>PnL</th>
               <th>Status</th>
             </tr>
@@ -51,7 +61,7 @@ export default function TradesTable({ trades }: Props): JSX.Element {
           <tbody>
             {trades.length === 0 && (
               <tr>
-                <td colSpan={8} className="empty">
+                <td colSpan={9} className="empty">
                   No trades yet.
                 </td>
               </tr>
@@ -66,6 +76,7 @@ export default function TradesTable({ trades }: Props): JSX.Element {
                 <td className="num">{fmtNum(t.notional)}</td>
                 <td className="num">{fmtNum(t.entry_price)}</td>
                 <td className="num">{fmtNum(t.exit_price)}</td>
+                <td className="num">{fmtCloses(t)}</td>
                 <td className={pnlClass(t.pnl)}>{fmtNum(t.pnl)}</td>
                 <td className={t.status === "open" ? "dim" : ""}>{t.status}</td>
               </tr>
